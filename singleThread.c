@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SIZE 128
+#define SIZE 1000
 #include <sys/time.h>
 
 double get_clock() {
