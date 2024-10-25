@@ -16,7 +16,7 @@ __global__ void scan(int* input, int* output){
   }
 
   // do the scan
-  for (int i = SIZE;  i < SIZE; i++) {
+  for (int i = 0;  i < SIZE; i++) {
    int value = 0;
    for (int j = 0; j <= i; j++) {
      value += input[j];
@@ -32,34 +32,25 @@ __global__ void scan(int* input, int* output){
 
 double get_clock() {
   struct timeval tv; 
-  int ok;
-  ok = gettimeofday(&tv, (void *) 0);
+  int ok = gettimeofday(&tv, (void *) 0);
   if (ok<0) { 
   	printf("gettimeofday error"); 
   }
   return (tv.tv_sec * 1.0 + tv.tv_usec * 1.0E-6);
 }
 
-int N;
-//int* times;
-
 int main(void) {
   // int N = 100;
-  // int i;
-  // int *input, *output
+  // Our SIZE is N (array size)
+ 
+  int *input, *output;
   
   double t0 = get_clock();
 
-  /*
+  
  // allocate memory
-	cudaMallocManaged(&input, N*sizeof(int));
-    cudaMallocManaged(&output, N*sizeof(int));
- */
- 
-  // allocate memory
-  int* input = (int*) malloc(sizeof(int) * SIZE);
-  int* output = (int*) malloc(sizeof(int) * SIZE);
-
+	cudaMallocManaged(&input, SIZE*sizeof(int));
+    cudaMallocManaged(&output, SIZE*sizeof(int));
   
   // initialize inputs
    for (int i = 0; i < SIZE; i++) {
@@ -67,7 +58,7 @@ int main(void) {
    }
 	
   // run the kernel
-  scan<<<1, 128>>>(input, output); 
+  scan<<<1,128>>>(input, output); 
 
   // synchronize 
   cudaDeviceSynchronize();
@@ -81,6 +72,9 @@ int main(void) {
   }
   printf("\n");
 
+
+  printf("%s\n", cudaGetErrorString(cudaGetLastError()));
+	
   // free mem
   cudaFree(input);
   cudaFree(output);
