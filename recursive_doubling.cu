@@ -15,14 +15,24 @@ __global__ void scan(int* input, int* output){
   	return;
   }
 
-  // do the scan
-  for (int i = 0;  i < SIZE; i++) {
-   int value = 0;
-   for (int j = 0; j <= i; j++) {
-     value += input[j];
-   }
-    output[i] = value;
-  }	
+  /*
+  int* source, destination; 
+
+  source = input;
+  destination = output;
+  */
+
+  int value = input[gindex];
+  for (int j=1; j <= gindex; j*=2) {
+  	value += input[j];
+  	/*
+  	for (int i=1; i <=j; i++) {
+	  	source = output;
+	  	destination = input;
+  	}
+  	*/
+  }
+  output[gindex] = value;
 
  
   __syncthreads();
