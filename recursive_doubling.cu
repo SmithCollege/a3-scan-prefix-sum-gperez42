@@ -20,28 +20,24 @@ __global__ void scan(int* input, int* output){
 
   source = &input[0];
   destination = &output[0];
-  int temp;
+  int* temp;
 
-  int value = input[gindex];
   // j is my stride, threadIdx is gindex
-  for (int j=1; j <= gindex; j*=2) {
-  	//value += input[j];
-    destination[gindex] = source[gindex] + source[gindex-j];
-    value = destination[gindex];
-
-
-	temp = destination[gindex];
-	destination[gindex] = source[gindex];
-	source[gindex] = temp;
-
+  for (int j=1; j <= SIZE; j*=2) {
+    __syncthreads();
+    if (gindex < j){
+     	destination[gindex] = source[gindex];
+     }
+     else{
+	    destination[gindex] = source[gindex] + source[gindex-j];
+		temp = destination;
+		destination = source;
+		source = temp;
+	}
   }
-  //output[gindex] = destination[gindex];
-  output[gindex] = value;
-  
-  //output[gindex] = value;
-
+  output[gindex] = source[gindex];
  
-  __syncthreads();
+  //__syncthreads();
 }
 
 
