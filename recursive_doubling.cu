@@ -25,6 +25,7 @@ __global__ void scan(int* input, int* output){
   // j is my stride, threadIdx is gindex
   for (int j=1; j <= SIZE; j*=2) {
     __syncthreads();
+    
     if (gindex < j){
      	destination[gindex] = source[gindex];
      }
@@ -37,7 +38,6 @@ __global__ void scan(int* input, int* output){
   }
   output[gindex] = source[gindex];
  
-  //__syncthreads();
 }
 
 
@@ -52,8 +52,6 @@ double get_clock() {
 }
 
 int main(void) {
-  // int N = 100;
-  // Our SIZE is N (array size)
  
   int *input, *output;
   
