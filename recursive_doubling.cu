@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <iostream>
 
-#define SIZE 128
+#define SIZE 500 // array size
+#define BLOCK_SIZE 128  // threads per block
 #include <sys/time.h>
 
 __global__ void scan(int* input, int* output){
@@ -31,10 +32,11 @@ __global__ void scan(int* input, int* output){
      }
      else{
 	    destination[gindex] = source[gindex] + source[gindex-j];
+	
+	}
 		temp = destination;
 		destination = source;
 		source = temp;
-	}
   }
   output[gindex] = source[gindex];
  
@@ -53,8 +55,9 @@ double get_clock() {
 
 int main(void) {
  
-  int *input, *output;
-  
+  int *input, *output;	
+  int x; // number of blocks to launch
+    
   double t0 = get_clock();
 
   
@@ -67,9 +70,20 @@ int main(void) {
     input[i] = 1;
    }
 	
-  // run the kernel
-  scan<<<1,128>>>(input, output); 
+  // Check if SIZE is a multiple of BLOCK_SIZE
+  if (SIZE % BLOCK_SIZE != 0) {
+    // If not a perfect multiple, calculate the number of blocks needed
+    if (SIZE > BLOCK_SIZE) {
+      x = SIZE / BLOCK_SIZE + 1; // Add 1 if not perfectly divisible
+      printf("Number of blocks (with extra): %d\n", x);
+    }
+  } else {
+    x = SIZE / BLOCK_SIZE; // Perfectly divisible case
+    printf("Number of blocks (perfectly divisible): %d\n", x);
+  }
 
+  // Launch the kernel with the calculated number of blocks
+  scan<<<x, BLOCK_SIZE>>>(input, output);
   // synchronize 
   cudaDeviceSynchronize();
 
